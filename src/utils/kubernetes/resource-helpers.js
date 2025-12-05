@@ -4,12 +4,16 @@ import { substituteEnvironmentVars } from "utils/config/config";
 import {
   ANNOTATION_BASE,
   ANNOTATION_WIDGET_BASE,
+  CONFIGMAP_REF_PREFIX,
   getKubeConfig,
   HTTPROUTE_API_GROUP,
   HTTPROUTE_API_VERSION,
+  SECRET_REF_PREFIX,
 } from "utils/config/kubernetes";
 import * as shvl from "utils/config/shvl";
 import createLogger from "utils/logger";
+import getSecretPropertyValue from "./secret";
+import getConfigMapPropertyValue from "./configmap";
 
 const logger = createLogger("resource-helpers");
 const kc = getKubeConfig();
@@ -116,15 +120,19 @@ export async function constructedServiceFromResource(resource) {
     constructedService.statusStyle = resource.metadata.annotations[`${ANNOTATION_BASE}/statusStyle`];
   }
 
-  Object.keys(resource.metadata.annotations).forEach((annotation) => {
+  await Promise.all(Object.keys(resource.metadata.annotations).map(async (annotation) => {
     if (annotation.startsWith(ANNOTATION_WIDGET_BASE)) {
       shvl.set(
         constructedService,
         annotation.replace(`${ANNOTATION_BASE}/`, ""),
-        resource.metadata.annotations[annotation],
+        await resolveAsRef(resource.metadata.annotations[annotation]),
       );
     }
-  });
+  }));
+
+  if (!constructedService?.widget?.url) {
+    shvl.set(constructedService, 'widget.url', await getUrlSchema(resource));
+  }
 
   try {
     constructedService = JSON.parse(substituteEnvironmentVars(JSON.stringify(constructedService)));
@@ -134,4 +142,18 @@ export async function constructedServiceFromResource(resource) {
   }
 
   return constructedService;
+}
+
+async function resolveAsRef(value) {
+  if (value.startsWith(SECRET_REF_PREFIX)) {
+    const ref = value.replace(SECRET_REF_PREFIX, "");
+    const [namespace, name, property] = ref.split('/')
+    return await getSecretPropertyValue(namespace, name, property)
+  }
+  if (value.startsWith(CONFIGMAP_REF_PREFIX)) {
+    const ref = value.replace(CONFIGMAP_REF_PREFIX, "");
+    const [namespace, name, property] = ref.split('/')
+    return await getConfigMapPropertyValue(namespace, name, property)
+  }
+  return value
 }
