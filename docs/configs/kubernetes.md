@@ -119,7 +119,7 @@ If you have a single service that needs to be shown on multiple specific instanc
 
 Use the `gethomepage.dev/pod-selector` selector to specify the pod used for the health check. For example, a service that is annotated with `gethomepage.dev/pod-selector: app.kubernetes.io/name=deployment` would link to a pod with the label `app.kubernetes.io/name: deployment`.
 
-Because the `url` property is quite common on widges, the default value is the same as the `href` value unless specified by an annotation.
+Because the `url` property is quite common on widgets, the default value is the same as the `href` value unless specified by an annotation.
 
 ### Traefik IngressRoute support
 
