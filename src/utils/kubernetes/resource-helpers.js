@@ -1,5 +1,8 @@
 import { CustomObjectsApi } from "@kubernetes/client-node";
 
+import getSecretPropertyValue from "./secret";
+import getConfigMapPropertyValue from "./configmap";
+
 import { substituteEnvironmentVars } from "utils/config/config";
 import {
   ANNOTATION_BASE,
@@ -12,8 +15,6 @@ import {
 } from "utils/config/kubernetes";
 import * as shvl from "utils/config/shvl";
 import createLogger from "utils/logger";
-import getSecretPropertyValue from "./secret";
-import getConfigMapPropertyValue from "./configmap";
 
 const logger = createLogger("resource-helpers");
 const kc = getKubeConfig();
