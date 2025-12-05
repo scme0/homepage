@@ -130,7 +130,7 @@ export async function constructedServiceFromResource(resource) {
     }
   }));
 
-  if (!constructedService?.widget?.url) {
+  if (constructedService?.widget && !constructedService.widget.url) {
     shvl.set(constructedService, 'widget.url', await getUrlSchema(resource));
   }
 
