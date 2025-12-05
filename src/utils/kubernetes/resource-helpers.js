@@ -131,10 +131,6 @@ export async function constructedServiceFromResource(resource) {
     }
   }));
 
-  if (constructedService?.widget && !constructedService.widget.url) {
-    shvl.set(constructedService, 'widget.url', await getUrlSchema(resource));
-  }
-
   try {
     constructedService = JSON.parse(substituteEnvironmentVars(JSON.stringify(constructedService)));
   } catch (e) {
