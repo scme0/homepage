@@ -93,7 +93,7 @@ metadata:
     gethomepage.dev/icon: emby.png
     gethomepage.dev/name: Emby
     gethomepage.dev/widget.type: "emby"
-    gethomepage.dev/widget.url: "https://emby.example.com"
+    gethomepage.dev/widget.url: "https://emby.example.com" # optional, is set to href value if not specified
     gethomepage.dev/pod-selector: ""
     gethomepage.dev/weight: 10 # optional
     gethomepage.dev/instance: "public" # optional
@@ -118,6 +118,8 @@ If you are using multiple instances of homepage, an `instance` annotation can be
 If you have a single service that needs to be shown on multiple specific instances of homepage (but not on all of them), the service can be annotated by multiple `instance.name` annotations, where `name` can be the names of your specific multiple homepage instances. For example, a service that is annotated with `gethomepage.dev/instance.public: ""` and `gethomepage.dev/instance.internal: ""` will be shown on `public` and `internal` homepage instances.
 
 Use the `gethomepage.dev/pod-selector` selector to specify the pod used for the health check. For example, a service that is annotated with `gethomepage.dev/pod-selector: app.kubernetes.io/name=deployment` would link to a pod with the label `app.kubernetes.io/name: deployment`.
+
+Because the `url` property is quite common on widges, the default value is the same as the `href` value unless specified by an annotation.
 
 ### Traefik IngressRoute support
 
@@ -167,6 +169,32 @@ To enable Gateway API HttpRoute update `kubernetes.yaml` to include:
 
 ```
 gateway: true # enable gateway-api
+```
+
+### Referencing Configmap and Secret values
+
+Sometimes you may want to reference a ConfigMap or Secret value in your annotations. For example, using a secret for `gethomepage.dev/widget.key`.
+To do this, you can use the syntax `<sec|cm>.ref#<namespace>/<name>/<key>` where `sec` will reference a secret and `cm` will reference a configmap.
+
+For example:
+
+```yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: pihole-credentials
+  namespace: pihole
+data:
+  password: my-safe-password
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pihole
+  annotations:
+    gethomepage.dev/widget.type: pihole
+    gethomepage.dev/widget.key: "sec.ref#pihole/pihole-credentials/password"
+...
 ```
 
 #### Using the unoffocial helm chart?
