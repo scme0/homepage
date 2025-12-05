@@ -93,7 +93,7 @@ metadata:
     gethomepage.dev/icon: emby.png
     gethomepage.dev/name: Emby
     gethomepage.dev/widget.type: "emby"
-    gethomepage.dev/widget.url: "https://emby.example.com" # optional, is set to href value if not specified
+    gethomepage.dev/widget.url: "https://emby.example.com"
     gethomepage.dev/pod-selector: ""
     gethomepage.dev/weight: 10 # optional
     gethomepage.dev/instance: "public" # optional
@@ -118,8 +118,6 @@ If you are using multiple instances of homepage, an `instance` annotation can be
 If you have a single service that needs to be shown on multiple specific instances of homepage (but not on all of them), the service can be annotated by multiple `instance.name` annotations, where `name` can be the names of your specific multiple homepage instances. For example, a service that is annotated with `gethomepage.dev/instance.public: ""` and `gethomepage.dev/instance.internal: ""` will be shown on `public` and `internal` homepage instances.
 
 Use the `gethomepage.dev/pod-selector` selector to specify the pod used for the health check. For example, a service that is annotated with `gethomepage.dev/pod-selector: app.kubernetes.io/name=deployment` would link to a pod with the label `app.kubernetes.io/name: deployment`.
-
-Because the `url` property is quite common on widges, the default value is the same as the `href` value unless specified by an annotation.
 
 ### Traefik IngressRoute support
 
